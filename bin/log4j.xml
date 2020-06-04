@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration PUBLIC "-//APACHE//DTD LOG4J 1.2//EN" "http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd">
+
+<log4j:configuration
+	xmlns:log4j="http://jakarta.apache.org/log4j/">
+	<!-- Only use this appender in debugging mode -->
+	<appender name="file"
+		class="org.apache.log4j.RollingFileAppender">
+		<param name="file" value="${user.dir}/logs/BTMJavaCore.log" />
+		<param name="MaxFileSize" value="5000KB" />
+		<!-- Keep one backup file -->
+		<param name="MaxBackupIndex" value="10" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %-5p [%c] %.1000m%n" />
+		</layout>
+	</appender>
+
+	<!-- For Hub -->
+	<logger name="btm.java.core.util" additivity="false">
+		<level value="info" />
+		<appender-ref ref="file" />
+	</logger>
+	<root>
+		<level value="info" />
+		<appender-ref ref="file" />
+	</root>
+</log4j:configuration>

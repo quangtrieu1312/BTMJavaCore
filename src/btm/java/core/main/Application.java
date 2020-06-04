@@ -4,11 +4,13 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -21,11 +23,10 @@ import btm.java.core.domain.employee.IEmployee;
 import btm.java.core.util.Validator;
 
 public class Application {
+
+	private static Logger LOG = Logger.getLogger(Application.class);
+
 	private static File getInputFile() {
-		File dir = new File(FileDir.TEST);
-		if (!dir.exists()) {
-			dir.mkdirs();
-		}
 		return new File(FileDir.TEST + "/input.txt");
 	}
 
@@ -60,45 +61,36 @@ public class Application {
 		}
 		return em;
 	}
-	
+
+	private static List<String> getLinesFromFile(File input) throws IOException {
+		BufferedInputStream iStream = new BufferedInputStream(new FileInputStream(input));
+		List<String> lines = new ArrayList<String>();
+		int data;
+		char temp;
+		String line = "";
+		while ((data = iStream.read()) != -1) {
+			temp = (char) data;
+			if (temp == '\r' || temp == '\n') {
+				if (line.isEmpty()) {
+					continue;
+				}
+				lines.add(line);
+				line = "";
+			} else {
+				line += temp;
+			}
+		}
+		iStream.close();
+		return lines;
+	}
+
 	public static void main(String args[]) {
 		IEmployee em = null;
 		File input = getInputFile();
 		try {
-			Session session = HibernateConfig.openSession();
-			Transaction transaction = session.beginTransaction();
-			
-			if (!input.exists()) {
-				input.createNewFile();
-			}
-			BufferedInputStream iStream = new BufferedInputStream(new FileInputStream(input));
-			int data;
-			char temp;
-			String word = "";
-			String[] toks;
-			while ((data = iStream.read()) != -1) {
-				temp = (char) data;
-				if (temp == '\r' || temp == '\n') {
-					if (word.isEmpty()) {
-						continue;
-					}
-					toks = word.split("\\|");
 
-					em = calcSalary(toks);
-					session.persist(em);
-
-					word = "";
-					continue;
-				} else {
-					word += temp;
-				}
-			}
-			iStream.close();
-			
-			transaction.commit();
-			session.close();
 		} catch (Exception e) {
-			System.out.println("Exception: " + e);
+			LOG.error("Exception: " + e);
 		}
 	}
 }
