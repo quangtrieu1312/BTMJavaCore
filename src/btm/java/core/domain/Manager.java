@@ -13,6 +13,7 @@ import btm.java.core.domain.employee.IEmployee;
 @Entity
 @DiscriminatorValue(value = "Manager")
 public class Manager extends AbsEmployee implements IEmployee {
+	
 	public Manager(String employeeName, String startDate, Double baseSalary, Integer workingDays) {
 		this.setEmployeeName(employeeName);
 		this.setStartDate(startDate);
@@ -25,5 +26,10 @@ public class Manager extends AbsEmployee implements IEmployee {
 		Double salary = this.getBaseSalary();
 		this.setSalary(salary);
 	}
+	@Override
+	public String toString() {
+		return EmployeeType.MANAGER + "|" + this.getEmployeeName() + "|" + this.getStartDate() + "|" + this.getBaseSalary()
+				+ "|" + this.getWorkingDays() + "|" + this.getSalary();
 
+	}
 }
