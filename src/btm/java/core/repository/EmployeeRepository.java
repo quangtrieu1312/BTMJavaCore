@@ -1,6 +1,7 @@
 package btm.java.core.repository;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
 
@@ -23,5 +24,8 @@ public interface EmployeeRepository {
 	void saveErrorFile(String filename, List<String> content);
 
 	void updatePaths(String inboundPath, String outboundPath) throws Exception;
+	
+	void saveEmployeeToDB(IEmployee employee);
 
+	Vector<String> getLinesFromFile(File input) throws IOException;
 }

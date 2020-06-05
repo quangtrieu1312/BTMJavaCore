@@ -197,33 +197,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 		return instance;
 	}
 
-	private Vector<String> getLinesFromFile(File input) throws IOException {
-		Vector<String> lines = new Vector<String>();
-		int data;
-		char temp;
-		String line = "";
-		try {
-			BufferedInputStream iStream = new BufferedInputStream(new FileInputStream(input));
-			while ((data = iStream.read()) != -1) {
-				temp = (char) data;
-				if (temp == '\r' || temp == '\n') {
-					if (line.isEmpty()) {
-						continue;
-					}
-					lines.add(line);
-					line = "";
-				} else {
-					line += temp;
-				}
-			}
-			iStream.close();
-			return lines;
-		} catch (Exception e) {
-			LOG.error("[getLinesFromFile]: " + e);
-			return null;
-		}
-	}
-
 	private IEmployee calcSalaryFromBasicInfo(IEmployee employee) {
 		employee.calcSalary();
 		return employee;
@@ -244,7 +217,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 				Vector<String> successLines = new Vector<String>();
 
 				LOG.info("-----> START PROCESSING INBOUND FILE <-----");
-				lines = getLinesFromFile(inboundFile);
+				lines = employeeRepository.getLinesFromFile(inboundFile);
 				if (lines == null) {
 					continue;
 				}

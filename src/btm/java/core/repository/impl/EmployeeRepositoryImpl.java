@@ -1,15 +1,21 @@
 package btm.java.core.repository.impl;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import btm.java.core.domain.employee.IEmployee;
 import btm.java.core.repository.EmployeeRepository;
+import btm.java.core.util.HibernateUtil;
 
 public class EmployeeRepositoryImpl implements EmployeeRepository {
 	private static EmployeeRepository instance;
@@ -127,9 +133,56 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
 
 	@Override
 	public void updatePaths(String inboundPath, String outboundPath) throws Exception {
+		this.checkPath(inboundPath);
+		this.checkPath(outboundPath);
 		this.inboundPath = inboundPath;
 		this.outboundPath = outboundPath;
-		this.getInboundDir();
-		this.getOutboundDir();
+	}
+
+	private void checkPath(String path) throws Exception {
+		File file = new File(path);
+		if (!file.exists()) {
+			throw new Exception("Invalid path");
+		}
+	}
+	
+	@Override
+	public Vector<String> getLinesFromFile(File input) throws IOException {
+		Vector<String> lines = new Vector<String>();
+		int data;
+		char temp;
+		String line = "";
+		try {
+			BufferedInputStream iStream = new BufferedInputStream(new FileInputStream(input));
+			while ((data = iStream.read()) != -1) {
+				temp = (char) data;
+				if (temp == '\r' || temp == '\n') {
+					if (line.isEmpty()) {
+						continue;
+					}
+					lines.add(line);
+					line = "";
+				} else {
+					line += temp;
+				}
+			}
+			iStream.close();
+			return lines;
+		} catch (Exception e) {
+			LOG.error("[getLinesFromFile]: " + e);
+			return null;
+		}
+	}
+
+	@Override
+	public void saveEmployeeToDB(IEmployee employee) {
+		Session session = HibernateUtil.openSession();
+		Transaction transaction = session.beginTransaction();
+		
+		session.save(employee);
+		
+		transaction.commit();
+		session.close();
+		
 	}
 }

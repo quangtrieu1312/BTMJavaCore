@@ -1,4 +1,4 @@
-package btm.java.core.main;
+package btm.java.core.application;
 
 import org.apache.log4j.Logger;
 

@@ -12,6 +12,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.DiscriminatorOptions;
 
 @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "Employee_type")
 @DiscriminatorOptions(force = true)
 public class AbsEmployee {
