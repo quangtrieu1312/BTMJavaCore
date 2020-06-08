@@ -1,18 +1,26 @@
 package btm.java.core.domain.employee;
 
+import java.util.Date;
+
 import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
 @MappedSuperclass
-public class AbsEmployee {
+public abstract class AbsEmployee {
+	
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "Employee_Id")
+	private Long employeeId;
 	@Column(name = "Employee_name")
 	private String employeeName;
 	@Column(name = "Type")
 	private Integer type;
 	@Column(name = "Start_date")
-	private String startDate;
+	private Date startDate;
 	@Column(name = "Base_salary")
 	private Double baseSalary;
 	@Column(name = "Working_days")
@@ -24,7 +32,7 @@ public class AbsEmployee {
 
 	}
 
-	public AbsEmployee(String employeeName, Integer type, String startDate, Double baseSalary, Integer workingDays,
+	public AbsEmployee(String employeeName, Integer type, Date startDate, Double baseSalary, Integer workingDays,
 			Double salary) {
 		this.setEmployeeName(employeeName);
 		this.setType(type);
@@ -50,11 +58,11 @@ public class AbsEmployee {
 		this.employeeName = employeeName;
 	}
 
-	public String getStartDate() {
+	public Date getStartDate() {
 		return startDate;
 	}
 
-	public void setStartDate(String startDate) {
+	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
 	}
 
@@ -80,5 +88,13 @@ public class AbsEmployee {
 
 	public void setSalary(Double salary) {
 		this.salary = salary;
+	}
+
+	public Long getEmployeeId() {
+		return employeeId;
+	}
+
+	public void setEmployeeId(Long employeeId) {
+		this.employeeId = employeeId;
 	}
 }

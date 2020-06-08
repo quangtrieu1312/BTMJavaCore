@@ -1,5 +1,8 @@
 package btm.java.core.domain;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
@@ -17,7 +20,7 @@ import btm.java.core.domain.employee.IEmployee;
 @Immutable
 public class Developer extends AbsEmployee implements IEmployee {
 
-	public Developer(String employeeName, String startDate, Double baseSalary, Integer workingDays) {
+	public Developer(String employeeName, Date startDate, Double baseSalary, Integer workingDays) {
 		this.setEmployeeName(employeeName);
 		this.setType(EmployeeType.DEV);
 		this.setStartDate(startDate);
@@ -33,7 +36,8 @@ public class Developer extends AbsEmployee implements IEmployee {
 
 	@Override
 	public String toString() {
-		return this.getType() + "|" + this.getEmployeeName() + "|" + this.getStartDate() + "|" + this.getBaseSalary()
+		return this.getType() + "|" + this.getEmployeeName() + "|"
+				+ (new SimpleDateFormat("mm/dd/yyyy").format(this.getStartDate())) + "|" + this.getBaseSalary()
 				+ "|" + this.getWorkingDays() + "|" + this.getSalary();
 
 	}

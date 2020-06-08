@@ -1,13 +1,22 @@
 package btm.java.core.domain.employee;
 
+import java.util.Date;
+
 public interface IEmployee {
 	public String getEmployeeName();
 
 	public void setEmployeeName(String employeeName);
+	public Integer getType();
 
-	public String getStartDate();
+	public void setType(Integer type);
+	
+	public Long getEmployeeId();
+	
+	public void setEmployeeId(Long employeeId);
 
-	public void setStartDate(String startDate);
+	public Date getStartDate();
+
+	public void setStartDate(Date startDate);
 
 	public Double getBaseSalary();
 
@@ -22,4 +31,6 @@ public interface IEmployee {
 	public void setSalary(Double salary);
 
 	public void calcSalary();
+
+	
 }

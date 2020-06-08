@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
@@ -20,6 +22,8 @@ import btm.java.core.repository.EmployeeRepository;
 import btm.java.core.repository.impl.EmployeeRepositoryImpl;
 import btm.java.core.service.EmployeeService;
 import btm.java.core.util.Validator;
+
+import btm.java.core.domain.*;
 
 public class EmployeeServiceImpl implements EmployeeService {
 
@@ -70,12 +74,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 				}
 				Integer type = Integer.parseInt(toks[0]);
 				String employeeName = toks[1];
-				String startDate = toks[2];
+				Date startDate = new SimpleDateFormat("mm/dd/yyyy").parse(toks[2]);
 				Double baseSalary = Double.parseDouble(toks[3]);
 				Integer workingDays = Integer.parseInt(toks[4]);
-				if (!Validator.isDDMMYYYY(startDate)) {
-					throw new Exception("Invalid date format");
-				}
 				switch (type) {
 				case 1:
 					employee = new Developer(employeeName, startDate, baseSalary, workingDays);
@@ -203,7 +204,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 
 	@Override
-	public void processInboundFiles(String inboundPath, String outboundPath) {
+	public Vector<IEmployee> processInboundFiles(String inboundPath, String outboundPath) {
+		Vector<IEmployee> fullList = new Vector<IEmployee>();
 		try {
 			employeeRepository.updatePaths(inboundPath, outboundPath);
 
@@ -234,6 +236,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 					employeeRepository.saveOutboundFile(inboundFile.getName(), employees);
 					for (IEmployee employee : employees) {
 						try {
+							fullList.add(employee);
 							employeeRepository.saveEmployeeToDB(employee);
 						} catch (Exception e) {
 							LOG.error("[processInboundFiles]: " + e);
@@ -250,6 +253,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		} finally {
 			LOG.info("___________  DONE PROCESSING FILES ___________");
 		}
+		return fullList;
 	}
 
 	@Override

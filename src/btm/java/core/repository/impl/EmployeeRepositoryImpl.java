@@ -145,7 +145,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
 			throw new Exception("Invalid path");
 		}
 	}
-	
+
 	@Override
 	public Vector<String> getLinesFromFile(File input) throws IOException {
 		Vector<String> lines = new Vector<String>();
@@ -176,14 +176,17 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
 
 	@Override
 	public void saveEmployeeToDB(IEmployee employee) {
-		
-		Session session = HibernateUtil.openSession();
-		Transaction transaction = session.beginTransaction();
-		
-		session.save(employee);
-		
-		transaction.commit();
-		session.close();
-		
+		try {
+			Session session = HibernateUtil.openSession();
+			Transaction transaction = session.beginTransaction();
+
+			session.save(employee);
+
+			transaction.commit();
+			session.close();
+		} catch (Exception e) {
+			LOG.error("[saveEmployeeToDB]: " + e);
+		}
+
 	}
 }

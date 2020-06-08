@@ -1,5 +1,8 @@
 package btm.java.core.domain;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
@@ -17,7 +20,7 @@ import btm.java.core.domain.employee.IEmployee;
 @Immutable
 public class Tester extends AbsEmployee implements IEmployee {
 
-	public Tester(String employeeName, String startDate, Double baseSalary, Integer workingDays) {
+	public Tester(String employeeName, Date startDate, Double baseSalary, Integer workingDays) {
 		this.setEmployeeName(employeeName);
 		this.setType(EmployeeType.TESTER);
 		this.setStartDate(startDate);
@@ -25,8 +28,10 @@ public class Tester extends AbsEmployee implements IEmployee {
 		this.setWorkingDays(workingDays);
 	}
 
-	private Integer calcWorkingYear() {
-		return this.getWorkingDays() / 365;
+	private Long calcWorkingYear() {
+		long now = (new Date()).getTime();
+		long startDate = this.getStartDate().getTime();
+		return (now - startDate) / 1000 / 60 / 60 / 25 / 365;
 	}
 
 	@Override
@@ -46,8 +51,9 @@ public class Tester extends AbsEmployee implements IEmployee {
 
 	@Override
 	public String toString() {
-		return this.getType() + "|" + this.getEmployeeName() + "|" + this.getStartDate() + "|"
-				+ this.getBaseSalary() + "|" + this.getWorkingDays() + "|" + this.getSalary();
+		return this.getType() + "|" + this.getEmployeeName() + "|"
+				+ (new SimpleDateFormat("mm/dd/yyyy").format(this.getStartDate())) + "|" + this.getBaseSalary() + "|"
+				+ this.getWorkingDays() + "|" + this.getSalary();
 
 	}
 

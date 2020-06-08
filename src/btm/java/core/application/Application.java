@@ -1,10 +1,20 @@
 package btm.java.core.application;
 
+import java.util.Vector;
+
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
+
 import org.apache.log4j.Logger;
 
 import btm.java.core.constant.FileDir;
 import btm.java.core.service.EmployeeService;
 import btm.java.core.service.impl.EmployeeServiceImpl;
+
+import btm.java.core.domain.employee.IEmployee;
 
 public class Application {
 
@@ -28,6 +38,12 @@ public class Application {
 			inboundPath = args[0];
 			outboundPath = args[1];
 		}
-		employeeService.processInboundFiles(inboundPath, outboundPath);
+		Vector<IEmployee> employees = employeeService.processInboundFiles(inboundPath, outboundPath);
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				new SpreadSheet(employees);
+			}
+		});
 	}
 }
