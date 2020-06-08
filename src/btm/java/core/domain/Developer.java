@@ -6,16 +6,20 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Immutable;
+
 import btm.java.core.constant.EmployeeType;
 import btm.java.core.domain.employee.AbsEmployee;
 import btm.java.core.domain.employee.IEmployee;
 
 @Entity
-@DiscriminatorValue(value = "Developer")
+@Table(name = "EMPLOYEE")
+@Immutable
 public class Developer extends AbsEmployee implements IEmployee {
 
 	public Developer(String employeeName, String startDate, Double baseSalary, Integer workingDays) {
 		this.setEmployeeName(employeeName);
+		this.setType(EmployeeType.DEV);
 		this.setStartDate(startDate);
 		this.setBaseSalary(baseSalary);
 		this.setWorkingDays(workingDays);
@@ -29,7 +33,7 @@ public class Developer extends AbsEmployee implements IEmployee {
 
 	@Override
 	public String toString() {
-		return EmployeeType.DEV + "|" + this.getEmployeeName() + "|" + this.getStartDate() + "|" + this.getBaseSalary()
+		return this.getType() + "|" + this.getEmployeeName() + "|" + this.getStartDate() + "|" + this.getBaseSalary()
 				+ "|" + this.getWorkingDays() + "|" + this.getSalary();
 
 	}

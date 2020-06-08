@@ -176,6 +176,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
 
 	@Override
 	public void saveEmployeeToDB(IEmployee employee) {
+		
 		Session session = HibernateUtil.openSession();
 		Transaction transaction = session.beginTransaction();
 		

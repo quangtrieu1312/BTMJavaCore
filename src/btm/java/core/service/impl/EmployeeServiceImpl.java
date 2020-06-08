@@ -221,8 +221,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 				if (lines == null) {
 					continue;
 				}
-				LineSolver t1 = new LineSolver("ONE", lines, 0, lines.size() / 2, employees, errorLines, successLines);
-				LineSolver t2 = new LineSolver("TWO", lines, lines.size() / 2 + 1, lines.size() - 1, employees,
+				LineSolver t1 = new LineSolver("ONE", lines, 0, (lines.size() - 1) / 2, employees, errorLines,
+						successLines);
+				LineSolver t2 = new LineSolver("TWO", lines, (lines.size() - 1) / 2 + 1, lines.size() - 1, employees,
 						errorLines, successLines);
 				t1.getThread().join();
 				t2.getThread().join();
@@ -231,6 +232,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 				if (!successLines.isEmpty()) {
 					employeeRepository.saveArchiveFile(inboundFile.getName(), successLines);
 					employeeRepository.saveOutboundFile(inboundFile.getName(), employees);
+					for (IEmployee employee : employees) {
+						try {
+							employeeRepository.saveEmployeeToDB(employee);
+						} catch (Exception e) {
+							LOG.error("[processInboundFiles]: " + e);
+						}
+					}
 				}
 				if (!errorLines.isEmpty()) {
 					employeeRepository.saveErrorFile(inboundFile.getName(), errorLines);
@@ -242,5 +250,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 		} finally {
 			LOG.info("___________  DONE PROCESSING FILES ___________");
 		}
+	}
+
+	@Override
+	public void saveEmployeeToDB(IEmployee employee) {
+
+		employeeRepository.saveEmployeeToDB(employee);
+
 	}
 }

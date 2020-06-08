@@ -25,7 +25,7 @@
 
 		<!-- Hibernate needs to know the Java Beans -->
 		<mapping class="btm.java.core.domain.Developer" />
-		<mapping class="btm.java.core.domain.Manager" />
 		<mapping class="btm.java.core.domain.Tester" />
+		<mapping class="btm.java.core.domain.Manager" />
 	</session-factory>
 </hibernate-configuration>

@@ -1,24 +1,16 @@
 package btm.java.core.domain.employee;
 
 import javax.persistence.Column;
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.Table;
 
-import org.hibernate.annotations.DiscriminatorOptions;
-
-@Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "Employee_type")
-@DiscriminatorOptions(force = true)
+@MappedSuperclass
 public class AbsEmployee {
 	@Id
 	@Column(name = "Employee_name")
 	private String employeeName;
+	@Column(name = "Type")
+	private Integer type;
 	@Column(name = "Start_date")
 	private String startDate;
 	@Column(name = "Base_salary")
@@ -32,13 +24,22 @@ public class AbsEmployee {
 
 	}
 
-	public AbsEmployee(String employeeName, String startDate, Double baseSalary, Integer workingDays,
+	public AbsEmployee(String employeeName, Integer type, String startDate, Double baseSalary, Integer workingDays,
 			Double salary) {
 		this.setEmployeeName(employeeName);
+		this.setType(type);
 		this.setStartDate(startDate);
 		this.setBaseSalary(baseSalary);
 		this.setWorkingDays(workingDays);
 		this.setSalary(salary);
+	}
+
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
 	}
 
 	public String getEmployeeName() {
