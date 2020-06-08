@@ -1,12 +1,10 @@
 package btm.java.core.application;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Vector;
 
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.SwingUtilities;
-import javax.swing.table.DefaultTableModel;
 
 import org.apache.log4j.Logger;
 
@@ -22,9 +20,19 @@ public class Application {
 
 	private static Logger LOG = Logger.getLogger(Application.class);
 
-	public static void main(String args[]) {
-		String inboundPath = "";
-		String outboundPath = "";
+	private static String inboundPath = "";
+	private static String outboundPath = "";
+
+	private static void displayUI(Vector<IEmployee> employees) {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				new SpreadSheet(employees);
+			}
+		});
+	}
+
+	private static void initParams(String args[]) {
 		if (args.length == 0) {
 			inboundPath = FileDir.DEFAULT_INBOUND;
 			outboundPath = FileDir.DEFAULT_OUTBOUND;
@@ -38,12 +46,14 @@ public class Application {
 			inboundPath = args[0];
 			outboundPath = args[1];
 		}
+	}
+
+	public static void main(String args[]) {
+		initParams(args);
 		Vector<IEmployee> employees = employeeService.processInboundFiles(inboundPath, outboundPath);
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				new SpreadSheet(employees);
-			}
-		});
+		Vector<IEmployee> savedEmployees = employeeService.saveEmployeesToDB(employees);
+		employeeService.saveOutboundFile("employees_" + (new SimpleDateFormat("MMddyyyy").format(new Date())) + ".txt",
+				savedEmployees);
+		displayUI(savedEmployees);
 	}
 }

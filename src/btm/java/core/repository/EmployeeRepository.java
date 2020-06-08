@@ -23,9 +23,9 @@ public interface EmployeeRepository {
 
 	void saveErrorFile(String filename, List<String> content);
 
-	void updatePaths(String inboundPath, String outboundPath) throws Exception;
-	
-	void saveEmployeeToDB(IEmployee employee);
+	Boolean updatePaths(String inboundPath, String outboundPath) throws Exception;
+
+	IEmployee saveEmployeeToDB(IEmployee employee);
 
 	Vector<String> getLinesFromFile(File input) throws IOException;
 }

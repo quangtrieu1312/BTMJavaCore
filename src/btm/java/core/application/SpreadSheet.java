@@ -17,15 +17,20 @@ public class SpreadSheet extends JFrame {
 				"Salary" };
 
 		// actual data for the table in a 2d array
-		Object[][] data = new Object[employees.size()][columns.length];
+		Object[][] data = null;
+		if (employees != null) {
 
-		for (int i = 0; i < employees.size(); i++) {
-			data[i][0] = (Object) employees.get(i).getEmployeeName();
-			data[i][1] = (Object) employees.get(i).getType();
-			data[i][2] = (Object) new SimpleDateFormat("mm/dd/yyyy").format(employees.get(i).getStartDate());
-			data[i][3] = (Object) employees.get(i).getBaseSalary();
-			data[i][4] = (Object) employees.get(i).getWorkingDays();
-			data[i][5] = (Object) employees.get(i).getSalary();
+			data = new Object[employees.size()][columns.length];
+
+			for (int i = 0; i < employees.size(); i++) {
+				data[i][0] = (Object) employees.get(i).getEmployeeName();
+				data[i][1] = (Object) employees.get(i).getType();
+				data[i][2] = (Object) new SimpleDateFormat("mm/dd/yyyy").format(employees.get(i).getStartDate());
+				data[i][3] = (Object) employees.get(i).getBaseSalary();
+				data[i][4] = (Object) employees.get(i).getWorkingDays();
+				data[i][5] = (Object) employees.get(i).getSalary();
+			}
+
 		}
 
 		final Class[] columnClass = new Class[] { String.class, Integer.class, String.class, Double.class,

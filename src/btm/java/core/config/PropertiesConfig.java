@@ -16,7 +16,7 @@ import btm.java.core.constant.FileDir;
 
 public class PropertiesConfig {
 	private static Logger LOG = LogManager.getLogger(PropertiesConfig.class);
-	private static LinkedHashMap<String, String> configProperties = new LinkedHashMap<>();
+	private static LinkedHashMap<String, String> configProperties = new LinkedHashMap<String, String>();
 
 	public static Properties configFile;
 	public static boolean isWebEnable = false;

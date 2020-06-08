@@ -1,14 +1,8 @@
 package btm.java.core.service.impl;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -21,9 +15,6 @@ import btm.java.core.filter.FileFilter;
 import btm.java.core.repository.EmployeeRepository;
 import btm.java.core.repository.impl.EmployeeRepositoryImpl;
 import btm.java.core.service.EmployeeService;
-import btm.java.core.util.Validator;
-
-import btm.java.core.domain.*;
 
 public class EmployeeServiceImpl implements EmployeeService {
 
@@ -203,63 +194,101 @@ public class EmployeeServiceImpl implements EmployeeService {
 		return employee;
 	}
 
-	@Override
-	public Vector<IEmployee> processInboundFiles(String inboundPath, String outboundPath) {
-		Vector<IEmployee> fullList = new Vector<IEmployee>();
+	private void processLinesInParallel(Vector<String> lines, Vector<IEmployee> employees, Vector<String> errorLines,
+			Vector<String> successLines) {
 		try {
-			employeeRepository.updatePaths(inboundPath, outboundPath);
-
-			File[] inboundFiles = employeeRepository.getInboundDir().listFiles(new FileFilter());
-
-			LOG.info("___________ START PROCESSING FILES ___________");
-			for (File inboundFile : inboundFiles) {
-				Vector<IEmployee> employees = new Vector<IEmployee>();
-				Vector<String> lines = null;
-				Vector<String> errorLines = new Vector<String>();
-				Vector<String> successLines = new Vector<String>();
-
-				LOG.info("-----> START PROCESSING INBOUND FILE <-----");
-				lines = employeeRepository.getLinesFromFile(inboundFile);
-				if (lines == null) {
-					continue;
-				}
-				LineSolver t1 = new LineSolver("ONE", lines, 0, (lines.size() - 1) / 2, employees, errorLines,
-						successLines);
-				LineSolver t2 = new LineSolver("TWO", lines, (lines.size() - 1) / 2 + 1, lines.size() - 1, employees,
-						errorLines, successLines);
-				t1.getThread().join();
-				t2.getThread().join();
-				LOG.info("----->    DONE WITH INBOUND FILE    <-----");
-
-				if (!successLines.isEmpty()) {
-					employeeRepository.saveArchiveFile(inboundFile.getName(), successLines);
-					employeeRepository.saveOutboundFile(inboundFile.getName(), employees);
-					for (IEmployee employee : employees) {
-						try {
-							fullList.add(employee);
-							employeeRepository.saveEmployeeToDB(employee);
-						} catch (Exception e) {
-							LOG.error("[processInboundFiles]: " + e);
-						}
-					}
-				}
-				if (!errorLines.isEmpty()) {
-					employeeRepository.saveErrorFile(inboundFile.getName(), errorLines);
-				}
+			LOG.info("-----> START PROCESSING INBOUND LINES <-----");
+			if (lines == null) {
+				return;
 			}
-		} catch (Exception e) {
-			LOG.error("[main]: " + e);
-			System.out.println("[main]: " + e);
+			LineSolver t1 = new LineSolver("ONE", lines, 0, (lines.size() - 1) / 2, employees, errorLines,
+					successLines);
+			LineSolver t2 = new LineSolver("TWO", lines, (lines.size() - 1) / 2 + 1, lines.size() - 1, employees,
+					errorLines, successLines);
+			t1.getThread().join();
+			t2.getThread().join();
+		} catch (InterruptedException e) {
+			LOG.error("[processLinesInParallel]: " + e);
 		} finally {
-			LOG.info("___________  DONE PROCESSING FILES ___________");
+			LOG.info("----->    DONE WITH INBOUND LINES    <-----");
 		}
-		return fullList;
+	}
+
+	private void processInboundFile(File inboundFile, Vector<IEmployee> employees, Vector<String> lines,
+			Vector<String> errorLines, Vector<String> successLines) {
+
+		this.processLinesInParallel(lines, employees, errorLines, successLines);
+
+		employeeRepository.saveArchiveFile(inboundFile.getName(), successLines);
+		employeeRepository.saveErrorFile(inboundFile.getName(), errorLines);
 	}
 
 	@Override
-	public void saveEmployeeToDB(IEmployee employee) {
+	public void saveOutboundFile(String filename, Vector<IEmployee> employees) {
+		employeeRepository.saveOutboundFile(filename, employees);
+	}
 
-		employeeRepository.saveEmployeeToDB(employee);
+	@Override
+	public Vector<IEmployee> processInboundFiles(String inboundPath, String outboundPath) {
 
+		Vector<IEmployee> fullList = new Vector<IEmployee>();
+		Vector<IEmployee> employees = null;
+		Vector<String> lines = null;
+		Vector<String> errorLines = null;
+		Vector<String> successLines = null;
+		File[] inboundFiles = null;
+		Boolean updateSuccess = null;
+		try {
+			LOG.info("___________ START PROCESSING FILES ___________");
+			updateSuccess = employeeRepository.updatePaths(inboundPath, outboundPath);
+			if (!updateSuccess) {
+				return null;
+			}
+			inboundFiles = employeeRepository.getInboundDir().listFiles(new FileFilter());
+			for (File inboundFile : inboundFiles) {
+
+				employees = new Vector<IEmployee>();
+				lines = employeeRepository.getLinesFromFile(inboundFile);
+				errorLines = new Vector<String>();
+				successLines = new Vector<String>();
+
+				processInboundFile(inboundFile, employees, lines, errorLines, successLines);
+				if (employees != null) {
+					fullList.addAll(employees);
+				}
+
+			}
+			return fullList;
+		} catch (Exception e) {
+			LOG.error("[main]: " + e);
+			System.out.println("[main]: " + e);
+			return null;
+		} finally {
+			LOG.info("___________  DONE PROCESSING FILES ___________");
+		}
+	}
+
+	@Override
+	public IEmployee saveEmployeeToDB(IEmployee employee) {
+
+		return employeeRepository.saveEmployeeToDB(employee);
+
+	}
+
+	@Override
+	public Vector<IEmployee> saveEmployeesToDB(Vector<IEmployee> employees) {
+		Vector<IEmployee> savedEmployees = new Vector<IEmployee>();
+		IEmployee temp = null;
+		for (IEmployee employee : employees) {
+			try {
+				temp = employeeRepository.saveEmployeeToDB(employee);
+				if (temp != null) {
+					savedEmployees.add(temp);
+				}
+			} catch (Exception e) {
+				LOG.error("[processInboundFiles]: " + e);
+			}
+		}
+		return savedEmployees;
 	}
 }

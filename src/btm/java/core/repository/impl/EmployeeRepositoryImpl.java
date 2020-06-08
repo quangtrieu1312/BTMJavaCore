@@ -70,13 +70,16 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
 	public void saveOutboundFile(String filename, List<IEmployee> employees) {
 		LOG.info("--->>> START SAVING OUTBOUND FILE <<<---");
 		try {
+			if (employees == null || employees.size() == 0) {
+				return;
+			}
 			File outboundFile = new File(getOutboundDir() + File.separator + filename);
 			if (outboundFile.exists()) {
 				outboundFile.delete();
 			}
 			outboundFile.createNewFile();
 			BufferedOutputStream oStream = new BufferedOutputStream(new FileOutputStream(outboundFile));
-			String column = "Type|Employee Name|Start Date|Base Salary|Working Days\r\n";
+			String column = "Type|Employee Name|Start Date|Base Salary|Working Days|Salary\r\n";
 			oStream.write(column.getBytes());
 			for (IEmployee employee : employees) {
 				oStream.write((employee.toString() + "\r\n").getBytes());
@@ -93,6 +96,9 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
 	public void saveArchiveFile(String filename, List<String> content) {
 		LOG.info("---->> START SAVING ARCHIVE FILE <<----");
 		try {
+			if (content == null || content.size() == 0) {
+				return;
+			}
 			File archiveFile = new File(getArchiveDir() + File.separator + filename);
 			if (archiveFile.exists()) {
 				archiveFile.delete();
@@ -114,6 +120,9 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
 	public void saveErrorFile(String filename, List<String> content) {
 		LOG.info("------ START SAVING ERROR FILE ------");
 		try {
+			if (content == null || content.size() == 0) {
+				return;
+			}
 			File errorFile = new File(getErrorDir() + File.separator + "Error_" + filename);
 			if (errorFile.exists()) {
 				errorFile.delete();
@@ -132,18 +141,18 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
 	}
 
 	@Override
-	public void updatePaths(String inboundPath, String outboundPath) throws Exception {
-		this.checkPath(inboundPath);
-		this.checkPath(outboundPath);
-		this.inboundPath = inboundPath;
-		this.outboundPath = outboundPath;
+	public Boolean updatePaths(String inboundPath, String outboundPath) {
+		Boolean isValidPath = this.checkPath(inboundPath) && this.checkPath(outboundPath);
+		if (isValidPath) {
+			this.inboundPath = inboundPath;
+			this.outboundPath = outboundPath;
+		}
+		return isValidPath;
 	}
 
-	private void checkPath(String path) throws Exception {
+	private Boolean checkPath(String path) {
 		File file = new File(path);
-		if (!file.exists()) {
-			throw new Exception("Invalid path");
-		}
+		return file.exists();
 	}
 
 	@Override
@@ -175,7 +184,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
 	}
 
 	@Override
-	public void saveEmployeeToDB(IEmployee employee) {
+	public IEmployee saveEmployeeToDB(IEmployee employee) {
 		try {
 			Session session = HibernateUtil.openSession();
 			Transaction transaction = session.beginTransaction();
@@ -184,8 +193,11 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
 
 			transaction.commit();
 			session.close();
+
+			return employee;
 		} catch (Exception e) {
 			LOG.error("[saveEmployeeToDB]: " + e);
+			return null;
 		}
 
 	}

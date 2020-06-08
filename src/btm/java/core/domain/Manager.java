@@ -37,7 +37,7 @@ public class Manager extends AbsEmployee implements IEmployee {
 	@Override
 	public String toString() {
 		return this.getType() + "|" + this.getEmployeeName() + "|"
-				+ (new SimpleDateFormat("mm/dd/yyyy").format(this.getStartDate())) + "|" + this.getBaseSalary() + "|"
+				+ (new SimpleDateFormat("MM/dd/yyyy").format(this.getStartDate())) + "|" + this.getBaseSalary() + "|"
 				+ this.getWorkingDays() + "|" + this.getSalary();
 
 	}
