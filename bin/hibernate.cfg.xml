@@ -12,6 +12,7 @@
 		<property name="hibernate.connection.url">jdbc:mysql://192.168.192.128/BTMTraining?serverTimezone=UTC</property>
 		<property name="hibernate.connection.username">quangtrieu1312</property>
 		<property name="hibernate.connection.password">Suotng@ybay1312</property>
+		
 		<!-- Configure SQL Dialect -->
 		<property name="hibernate.dialect">org.hibernate.dialect.MySQL57Dialect</property>
 
@@ -27,5 +28,6 @@
 		<mapping class="btm.java.core.domain.Developer" />
 		<mapping class="btm.java.core.domain.Tester" />
 		<mapping class="btm.java.core.domain.Manager" />
+		
 	</session-factory>
 </hibernate-configuration>

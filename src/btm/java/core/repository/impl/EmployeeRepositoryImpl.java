@@ -84,11 +84,12 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
 			for (IEmployee employee : employees) {
 				oStream.write((employee.toString() + "\r\n").getBytes());
 			}
+			LOG.info("SAVED FILE " + outboundFile.getName());
 			oStream.close();
 		} catch (Exception e) {
 			LOG.error("[saveArchiveFile]: " + e);
 		} finally {
-			LOG.info("------  DONE SAVING OUTBOUND FILE ------");
+			LOG.info("--->>>  DONE SAVING OUTBOUND FILE <<<---");
 		}
 	}
 
@@ -108,6 +109,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
 			for (String line : content) {
 				oStream.write((line + "\r\n").getBytes());
 			}
+			LOG.info("SAVED FILE " + archiveFile.getName());
 			oStream.close();
 		} catch (IOException e) {
 			LOG.error("[saveArchiveFile]: " + e);
@@ -132,6 +134,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
 			for (String line : content) {
 				oStream.write((line + "\r\n").getBytes());
 			}
+			LOG.info("SAVED FILE " + errorFile.getName());
 			oStream.close();
 		} catch (IOException e) {
 			LOG.error("[saveArchiveFile]: " + e);

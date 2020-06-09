@@ -32,28 +32,31 @@ public class Application {
 		});
 	}
 
-	private static void initParams(String args[]) {
+	private static Boolean initParams(String args[]) {
 		if (args.length == 0) {
 			inboundPath = FileDir.DEFAULT_INBOUND;
 			outboundPath = FileDir.DEFAULT_OUTBOUND;
 			System.out.println("Use default inbound path: " + inboundPath);
 			System.out.println("Use default outbound path: " + outboundPath);
-		} else if (args.length == 2) {
+		} else if (args.length != 2) {
 			System.out.println("Error: File needs 2 input for inbound and outbound paths.");
 			System.out.println("If no input given, default path will be used.");
-			return;
+			return false;
 		} else {
 			inboundPath = args[0];
 			outboundPath = args[1];
 		}
+		return true;
 	}
 
 	public static void main(String args[]) {
-		initParams(args);
-		Vector<IEmployee> employees = employeeService.processInboundFiles(inboundPath, outboundPath);
-		Vector<IEmployee> savedEmployees = employeeService.saveEmployeesToDB(employees);
-		employeeService.saveOutboundFile("employees_" + (new SimpleDateFormat("MMddyyyy").format(new Date())) + ".txt",
-				savedEmployees);
-		displayUI(savedEmployees);
+		Boolean initSuccess = initParams(args);
+		if (initSuccess) {
+			Vector<IEmployee> employees = employeeService.processInboundFiles(inboundPath, outboundPath);
+			Vector<IEmployee> savedEmployees = employeeService.saveEmployeesToDB(employees);
+			employeeService.saveOutboundFile(
+					"employees_" + (new SimpleDateFormat("MMddyyyy").format(new Date())) + ".txt", savedEmployees);
+			displayUI(savedEmployees);
+		}
 	}
 }
